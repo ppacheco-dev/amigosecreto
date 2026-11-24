@@ -658,6 +658,33 @@ export default function AdminDashboardPage() {
                           </span>
                         </div>
                       )}
+
+                      {/* Admin-only Wishlist View */}
+                      {p.hasWishlist && (
+                        <div className="mt-3 bg-stone-50 border border-stone-200/80 rounded-2xl p-3 space-y-1.5">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                            🎁 Deseos (solo visible para admin)
+                          </p>
+                          {p.wishlist.length > 0 && (
+                            <ul className="space-y-1">
+                              {p.wishlist.map((w) => (
+                                <li
+                                  key={w.id}
+                                  className="text-xs font-medium text-stone-800 flex items-start gap-1.5"
+                                >
+                                  <span className="text-rose-500">•</span>
+                                  <span>{w.text}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {p.sizesOrNotes && (
+                            <p className="text-xs text-amber-900 bg-amber-50/80 border border-amber-200/70 rounded-xl px-2.5 py-1.5">
+                              <strong>Notas:</strong> {p.sizesOrNotes}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Personal Secret Link Buttons (prominent after draw) */}

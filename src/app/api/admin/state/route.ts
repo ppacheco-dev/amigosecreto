@@ -25,6 +25,8 @@ export async function GET() {
       hasWishlist:
         p.wishlist.length > 0 || p.sizesOrNotes.trim().length > 0,
       wishlistCount: p.wishlist.length,
+      wishlist: p.wishlist ?? [],
+      sizesOrNotes: p.sizesOrNotes ?? "",
       hasRevealed: p.hasRevealed,
       revealedAt: p.revealedAt,
       wishlistUpdatedAt: p.wishlistUpdatedAt,

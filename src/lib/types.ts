@@ -46,6 +46,8 @@ export interface AdminParticipantSummary {
   secretToken: string;
   hasWishlist: boolean;
   wishlistCount: number;
+  wishlist: WishItem[];
+  sizesOrNotes: string;
   hasRevealed: boolean;
   revealedAt: string | null;
   wishlistUpdatedAt: string | null;
