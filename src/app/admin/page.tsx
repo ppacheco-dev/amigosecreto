@@ -809,11 +809,21 @@ export default function AdminDashboardPage() {
 
               {!state?.restrictions.length ? (
                 <p className="text-sm text-stone-500">
-                  No hay restricciones aún. Todos pueden sacarse entre sí (salvo
-                  a sí mismos, eso siempre está bloqueado).
+                  No hay restricciones personalizadas aún. De forma automática,
+                  nadie puede sacarse a sí mismo y{" "}
+                  <strong>
+                    nunca habrá cruces mutuos (si a A le toca B, a B no le
+                    tocará A)
+                  </strong>
+                  .
                 </p>
               ) : (
-                <ul className="space-y-2">
+                <div className="space-y-3">
+                  <p className="text-xs text-stone-500">
+                    ✅ Reglas automáticas activas: nadie se saca a sí mismo y si
+                    a A le toca B, a B nunca le tocará A.
+                  </p>
+                  <ul className="space-y-2">
                   {state.restrictions.map((r) => (
                     <li
                       key={r.id}
@@ -841,7 +851,8 @@ export default function AdminDashboardPage() {
                       )}
                     </li>
                   ))}
-                </ul>
+                  </ul>
+                </div>
               )}
             </div>
           </div>

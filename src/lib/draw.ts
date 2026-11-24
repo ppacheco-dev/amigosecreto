@@ -107,7 +107,7 @@ export function runSecretSantaDraw(
     for (const giverId of remaining) {
       const avail = allowed
         .get(giverId)!
-        .filter((r) => !usedReceivers.has(r));
+        .filter((r) => !usedReceivers.has(r) && assignment[r] !== giverId);
       if (avail.length === 0) return false; // Dead end early pruning
       if (bestGiver === null || avail.length < bestCandidates.length) {
         bestGiver = giverId;
@@ -120,6 +120,9 @@ export function runSecretSantaDraw(
 
     unassigned.delete(bestGiver);
     for (const receiverId of shuffle(bestCandidates)) {
+      // Extra guard: never allow mutual 2-cycles (A -> B and B -> A)
+      if (assignment[receiverId] === bestGiver) continue;
+
       assignment[bestGiver] = receiverId;
       usedReceivers.add(receiverId);
 
