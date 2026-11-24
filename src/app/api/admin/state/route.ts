@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { runSecretSantaDraw } from "@/lib/draw";
-import { getGameState, getStorageMode, saveGameState } from "@/lib/store";
+import {
+  getDefaultState,
+  getGameState,
+  getStorageMode,
+  saveGameState,
+} from "@/lib/store";
 import type { AdminParticipantSummary } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -31,9 +36,9 @@ export async function GET() {
     state.participants.length >= 3
       ? runSecretSantaDraw(state.participants, state.restrictions)
       : {
-          ok: false,
-          error: "Agrega al menos 3 participantes para poder sortear.",
-        };
+        ok: false,
+        error: "Agrega al menos 3 participantes para poder sortear.",
+      };
 
   return NextResponse.json({
     config: {
@@ -83,4 +88,18 @@ export async function PATCH(req: Request) {
       { status: 400 }
     );
   }
+}
+
+export async function DELETE() {
+  const state = await getGameState();
+  if (!(await isAdminAuthenticated(state))) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const fresh = getDefaultState();
+  // Keep the organizer's password so they stay signed in cleanly
+  fresh.config.adminPinHash = state.config.adminPinHash;
+  await saveGameState(fresh);
+
+  return NextResponse.json({ ok: true });
 }

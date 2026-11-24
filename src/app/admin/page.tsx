@@ -83,8 +83,9 @@ export default function AdminDashboardPage() {
   const [cfgNotes, setCfgNotes] = useState("");
   const [savingSettings, setSavingSettings] = useState(false);
 
-  // Draw state
+  // Draw & reset states
   const [runningDraw, setRunningDraw] = useState(false);
+  const [resettingAll, setResettingAll] = useState(false);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -306,6 +307,37 @@ export default function AdminDashboardPage() {
       }
     } finally {
       setSavingSettings(false);
+    }
+  }
+
+  async function handleResetEverything() {
+    if (
+      !confirm(
+        "⚠️ ¿Borrar TODO y empezar desde 0?\n\nSe eliminarán todos los participantes, enlaces secretos, deseos, restricciones y el sorteo actual (tu clave de organizador se mantendrá)."
+      )
+    )
+      return;
+    if (
+      !confirm(
+        "Confirmación final: esta acción no se puede deshacer. ¿Seguro que quieres dejar la aplicación completamente en blanco?"
+      )
+    )
+      return;
+
+    setResettingAll(true);
+    try {
+      const res = await fetch("/api/admin/state", { method: "DELETE" });
+      if (res.ok) {
+        setFromId("");
+        setToId("");
+        await fetchAdminState();
+        setActiveTab("family");
+        showToast("🧹 Todo reiniciado desde 0.");
+      } else {
+        showToast("⚠️ No se pudo reiniciar.");
+      }
+    } finally {
+      setResettingAll(false);
     }
   }
 
@@ -914,69 +946,98 @@ export default function AdminDashboardPage() {
 
         {/* TAB 4: SETTINGS */}
         {activeTab === "settings" && (
-          <form
-            onSubmit={handleSaveSettings}
-            className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5 max-w-2xl"
-          >
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
-                Nombre del evento
-              </label>
-              <input
-                type="text"
-                value={cfgTitle}
-                onChange={(e) => setCfgTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-medium"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
-                  Presupuesto
-                </label>
-                <input
-                  type="text"
-                  value={cfgBudget}
-                  onChange={(e) => setCfgBudget(e.target.value)}
-                  placeholder="$20.000"
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-medium"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
-                  Fecha de entrega
-                </label>
-                <input
-                  type="text"
-                  value={cfgDate}
-                  onChange={(e) => setCfgDate(e.target.value)}
-                  placeholder="24 de Diciembre"
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-medium"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
-                Notas o reglas adicionales
-              </label>
-              <textarea
-                rows={3}
-                value={cfgNotes}
-                onChange={(e) => setCfgNotes(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={savingSettings}
-              className="px-6 py-3 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white text-sm font-bold cursor-pointer"
+          <div className="space-y-6 max-w-2xl">
+            <form
+              onSubmit={handleSaveSettings}
+              className="bg-white border border-stone-200 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5"
             >
-              {savingSettings ? "Guardando..." : "Guardar configuración"}
-            </button>
-          </form>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                  Nombre del evento
+                </label>
+                <input
+                  type="text"
+                  value={cfgTitle}
+                  onChange={(e) => setCfgTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                    Presupuesto
+                  </label>
+                  <input
+                    type="text"
+                    value={cfgBudget}
+                    onChange={(e) => setCfgBudget(e.target.value)}
+                    placeholder="$20.000"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                    Fecha de entrega
+                  </label>
+                  <input
+                    type="text"
+                    value={cfgDate}
+                    onChange={(e) => setCfgDate(e.target.value)}
+                    placeholder="24 de Diciembre"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-medium"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">
+                  Notas o reglas adicionales
+                </label>
+                <textarea
+                  rows={3}
+                  value={cfgNotes}
+                  onChange={(e) => setCfgNotes(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={savingSettings}
+                className="px-6 py-3 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white text-sm font-bold cursor-pointer"
+              >
+                {savingSettings ? "Guardando..." : "Guardar configuración"}
+              </button>
+            </form>
+
+            {/* Full Reset Card */}
+            <div className="bg-rose-50/70 border border-rose-200 rounded-3xl p-6 space-y-3">
+              <div className="flex items-center gap-2 text-rose-900">
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+                <h3 className="font-bold text-base">
+                  Reiniciar todo y empezar de 0
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-rose-900/80 leading-relaxed">
+                Borra por completo todos los participantes, enlaces secretos,
+                listas de deseos, restricciones y el sorteo actual para empezar
+                un amigo secreto nuevo desde cero.{" "}
+                <strong>Tu clave de organizador se conserva.</strong>
+              </p>
+              <button
+                type="button"
+                onClick={handleResetEverything}
+                disabled={resettingAll}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:bg-stone-300 text-white text-xs sm:text-sm font-bold shadow-xs cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+                {resettingAll
+                  ? "Reiniciando todo..."
+                  : "Borrar todo y empezar de 0"}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
