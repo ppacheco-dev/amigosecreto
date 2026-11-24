@@ -665,15 +665,15 @@ export default function AdminDashboardPage() {
                       <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-100">
                         <button
                           onClick={() => openWhatsAppPersonal(p)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-extrabold shadow-xs cursor-pointer"
+                          className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-extrabold shadow-xs cursor-pointer"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          Enviar enlace por WhatsApp
+                          Enviar por WhatsApp
                         </button>
 
                         <button
                           onClick={() => copyPersonalLink(p)}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold cursor-pointer"
                         >
                           {copiedId === p.id ? (
                             <>
@@ -683,10 +683,20 @@ export default function AdminDashboardPage() {
                           ) : (
                             <>
                               <Copy className="w-3.5 h-3.5" />
-                              Copiar link
+                              Copiar URL
                             </>
                           )}
                         </button>
+
+                        <a
+                          href={`/p/${p.secretToken}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          Abrir URL
+                        </a>
                       </div>
                     ) : (
                       <p className="text-[11px] text-stone-400 pt-2 border-t border-stone-100">
